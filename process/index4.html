@@ -1,0 +1,173 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+       
+        <script src="js/menu.js"></script>
+        <script src="js/vendor/three/RequestAnimationFrame.js"></script>
+        <script src="js/vendor/three/ThreeCanvas.js"></script>
+        <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+        <script type="text/javascript" src="http://cdn.tonejs.org/latest/Tone.min.js"></script>
+        <style>
+* { margin:0; padding:0; } 
+html, body { width:100%; height:100%; } 
+canvas { display:block; } 
+#la {position:absolute;top:10px;left:10px;font-family: sans-serif; font-size: 20px; font-weight: bold; color: white;}
+        </style>
+    </head>
+    <body>
+        
+        <canvas id="menu_canvas" ></canvas>
+        <div id="la">0</div>
+
+        <script>
+        $(document).on('ready', function(){
+            var canvas = document.getElementById('menu_canvas');
+            var context = canvas.getContext('2d');
+
+            var x = xmenu(context);
+            x.animate();
+
+            var synth = new Tone.PolySynth(3, Tone.FMSynth);
+            synth.set({
+                envelope : {
+                    attack : 0.3, sustain: .1
+                }, volume: .5
+            });
+            synth.toMaster();
+
+            var s2 = new Tone.PolySynth(3, Tone.FMSynth);
+            s2.toMaster();
+
+            var la = 0;
+
+            function drone(time){
+
+                if (Math.random()<.5)
+                   s2.triggerAttackRelease("C2", .8, time, Math.random());
+                else
+                   s2.triggerAttackRelease("G2", .8, time, Math.random());
+                if (Math.random()<.5)
+                   s2.triggerAttackRelease("C2", .8, time, Math.random());
+                else
+                   s2.triggerAttackRelease("G3", .8, time, Math.random()); //:-()
+                if (Math.random()<.5)
+                   s2.triggerAttackRelease("C1", .8, time, Math.random());
+                else
+                   s2.triggerAttackRelease("D2", .8, time, Math.random()); //:-)(
+            }
+            function rnd(r){
+                return Math.floor(Math.random()*r);
+            }
+            var phrases = [];
+            for (var i=0; i<5; i++) {
+                phrases.push({phrase: 
+                    gen_phrase(['C','C','C','G','G','G','D','D','B'], 
+                    ['2', '3','3','4'], .4, 0), 
+                mod: rnd(4)+4, vel: Math.random()});
+            }
+            for (var i=0; i<5; i++) {
+                phrases.push({phrase: 
+                    gen_phrase(['C','C','C','G','G','G','D','D','B','B'], 
+                    ['2', '3','3','4','4','4'], .2, 0), 
+                mod: rnd(3)+2, vel: Math.random()});
+            }
+            for (var i=0; i<5; i++) {
+                phrases.push({phrase: 
+                    gen_phrase(['C','C','C','G','G','G','D','D','B','B','A','A'], 
+                    ['3','3','4','4','4','5'], .1, .1), 
+                mod: rnd(3)+2, vel: Math.random()});
+            }
+            for (var i=0; i<5; i++) {
+                phrases.push({phrase: 
+                    gen_phrase(['C','C','C','G','G','G','D','D','B','B'], 
+                    ['2', '3','3','4','4','4'], .2, 0), 
+                mod: rnd(3)+2, vel: Math.random()});
+            }
+           for (var i=0; i<5; i++) {
+                phrases.push({phrase: 
+                    gen_phrase(['C','C','C','G','G','G','D','D','B','B','A','A'], 
+                    ['3','3','4','4','4','5','5'], .1, .05), 
+                mod: rnd(3)+2, vel: Math.random()});
+            }
+            function gen_phrase(notes,octaves,mind,vard){
+                var phrase = [];
+                var c = Math.floor(Math.random()*8)+3;
+                for (var i=0; i<c; i++){
+                    var d = mind + (vard * rnd(c-3));
+                    if (rnd(10)<3)
+                        phrase.push({note: null, duration: d});
+                    else
+                        phrase.push({note: notes[rnd(notes.length)]+octaves[rnd(octaves.length)], duration: d});
+                }
+                return phrase;
+            }
+            function m1(synth, time, phrase, vel){
+                for (var i=0; i<phrase.length; i++){
+                    var note = phrase[i].note;
+                    if (note)
+                        synth.triggerAttackRelease(note, phrase[i].duration, time, vel);
+                    time += phrase[i].duration;
+                }
+            }
+
+            var m = 0;
+            Tone.Transport.setInterval(function(time){
+                m++;
+                // droner
+                drone(time);
+                drone(time+.4);
+                //drone(time+.05);
+
+                for (var i=Math.max(0,la-8); i<la; i++) {
+                    if (m%phrases[i].mod == 0)
+                        m1(synth, time, phrases[i].phrase, phrases[i].vel);
+                }
+
+
+                if (m%4==0)
+                    x.move();
+
+            }, .8);
+
+            //start the transport
+            Tone.Transport.start();
+
+            $(document).on('click', function(){ 
+                la ++; 
+                if (la>24) la=3;
+                x.camera.position.z = 1000 + la * 300;
+                $("#la").text(la);
+            })
+
+
+            // resize
+            window.addEventListener('resize', resizeCanvas, false);
+
+            function resizeCanvas() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                    
+            }
+            resizeCanvas();
+        });
+
+        </script>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='https://www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-840716-22','auto');ga('send','pageview');
+        </script>
+    </body>
+</html>

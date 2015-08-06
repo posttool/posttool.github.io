@@ -1,0 +1,6 @@
+* { margin:0; padding:0; } 
+html, body { width:100%; height:100%; } 
+canvas { display:block; } 
+div { font-family: sans-serif; color: black; }
+#la {position:absolute; top:10px; left:10px; font-size: 96px; font-weight: bold; }
+#fa {position:absolute; bottom:15px; left: 10px; font-size: 14px; }
