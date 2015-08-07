@@ -27,7 +27,6 @@ $(document).on('ready', function () {
     $("#la").text(p);
   }
 
-
   $(document).on('click', function () {
     update(sound.part() + 1);
   });
@@ -42,12 +41,16 @@ $(document).on('ready', function () {
     }
   });
 
-
   $(window).on('resize', resizeCanvas, false);
   function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   }
+
+  $(window).on("touchstart", function (e) {
+    e.preventDefault();
+    Tone.startMobile();
+  });
 
   resizeCanvas();
   update();
