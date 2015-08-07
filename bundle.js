@@ -57,7 +57,7 @@
 	    var MEDIUM_LONG = LONG * .5;
 	    var MEDIUM = MEDIUM_LONG * .5;
 	    var MEDIUM_SHORT = MEDIUM * .5;
-	    var SHORT = MEDIUM_SHORT * .5;
+	    var SHORT = MEDIUM_SHORT;
 
 	    var canvas = document.getElementById('menu_canvas');
 	    var context = canvas.getContext('2d');
@@ -83,7 +83,7 @@
 
 	    var crusher = new Tone.Distortion({
 	        distortion : 0.1,
-	        wet : 0.4
+	        wet : 0.5
 	    });
 	    var hats = new Tone.Sampler("./audio/505/hh.mp3", {
 	        volume : -10,
@@ -97,11 +97,11 @@
 	        filter : {type: 'lowpass', freq:700}
 	    }).connect(crusher);
 	    var kick = new Tone.Sampler("./audio/505/kick.mp3", {
-	        volume: -25
+	        volume: -8
 	    });
-	    var eq = new Tone.EQ(4, -20, 0);
+	    var eq = new Tone.EQ3(4, 5, 0);
 	    kick.connect(eq);
-	    var drumCompress = new Tone.Compressor({threshold : -30, ratio : 6, attack : 0.01, release : 0.01}).toMaster();
+	    var drumCompress = new Tone.Compressor({threshold : -20, ratio : 6, attack : 0.01, release : 0.01}).toMaster();
 	    eq.connect(drumCompress);
 	    crusher.connect(drumCompress);
 
@@ -161,7 +161,7 @@
 	    }
 	    function gen_phrase(notes,octaves,mind,vard){
 	        var phrase = [];
-	        var c = Math.floor(Math.random()*8)+3;
+	        var c = Math.floor(Math.random()*18)+3;
 	        for (var i=0; i<c; i++){
 	            var d = mind + (vard * rnd(c-3));
 	            if (rnd(10)<3)
@@ -175,49 +175,52 @@
 	        for (var i=0; i<phrase.length; i++){
 	            var note = phrase[i].note;
 	            if (note)
-	                synth.triggerAttackRelease(note, phrase[i].duration, time, vel);
+	                synth.triggerAttackRelease(note, phrase[i].duration, time, vel*.333);
 	            
 	            time += phrase[i].duration;
 	        }
 	    }
-	    function snares(time, s){
-	        snare.triggerAttackRelease(0,SHORT, time, s);
-	        snare.triggerAttackRelease(0,SHORT, time+SHORT*.5, s);
-	        snare.triggerAttackRelease(0,SHORT, time+SHORT, s*Math.random());
-	        snare.triggerAttackRelease(0,SHORT, time+SHORT*1.5, s);
-	        snare.triggerAttackRelease(0,SHORT, time+LONG-MEDIUM, s*Math.random());
+	    function snarez(time, s){
+	        var r = rnd(3)+3;
+	        for (var i=0; i<r; i++) {
+	            if (rnd(10)>5)
+	                snare.triggerAttackRelease(0, SHORT, time+i*SHORT, s);
+	        }
+	    }
+	    function hatz(time, s){
+	        var r = rnd(16)+3;
+	        for (var i=0; i<r; i++) {
+	            if (i==0 || rnd(10)>3)
+	               hats.triggerAttackRelease(0, SHORT, time+i*SHORT, s);
+	        }
 	    }
 
 	    var m = 0;
 	    Tone.Transport.setInterval(function(time){
 	        m++;
 	        if (la<8 || la>15) {
-	        drone(time);
-	        drone(time+MEDIUM_LONG);
-	        //drone(time+SHORT);
+	            drone(time);
+	            drone(time+MEDIUM_LONG);
 	        }
 
-	        for (var i=Math.max(0,la-8); i<la; i++) {
+	        for (var i=Math.max(0,la-5); i<la; i++) {
 	            if (m%phrases[i].mod == 0) {
 	                var s = i%3 == 2 ? s3 : synth;
-
 	                m1(s, time, phrases[i].phrase, phrases[i].vel);
 	            }
 	        }
 	        if (la>10) {
-	            var s = .02*(la-8);
-	            hats.triggerAttackRelease(0,SHORT, time, s);
-	            hats.triggerAttackRelease(0,SHORT, time+SHORT*4, s);
+	            hatz(time, .01*(la-8));
 	        }
-	        if (la>15) {
-	            snares(time ,.1);
+	        if (la>12) {
+	            snarez(time ,.1);
 	        }
 	        if (la>18) {
-	            kick.triggerAttack(0, time, .3);
-
+	            kick.triggerAttack(0, time);
 	        }
-	        if (m%4==0)
+	        if (m%4==0) {
 	            x.move();
+	        }
 
 	    }, LONG);
 
@@ -234,11 +237,13 @@
 	    function next(){
 	        la++;
 	        if (la>24) la=0;
+	        localStorage.setItem('la', la);
 	        update();
 	    }
 	    function prev(){
 	        la--;
 	        if (la<0) la =24;
+	        localStorage.setItem('la', la);
 	        update();
 	    }
 	    function update(){
@@ -259,6 +264,12 @@
 	        }
 	         $("#la").text(la);
 	   };
+	   var lola = localStorage.getItem('la');
+	   if (lola) {
+	     la = lola;
+	     update();
+	   }
+
 	   
 
 
@@ -450,7 +461,7 @@
 
 
 	// module
-	exports.push([module.id, "* { margin:0; padding:0; } \nhtml, body { width:100%; height:100%; } \ncanvas { display:block; } \n#la {position:absolute;top:10px;left:10px;font-family: sans-serif; font-size: 76px; font-weight: bold; color: black;}\n", ""]);
+	exports.push([module.id, "* { margin:0; padding:0; } \nhtml, body { width:100%; height:100%; } \ncanvas { display:block; } \ndiv { font-family: sans-serif; color: black; }\n#la {position:absolute; top:10px; left:10px; font-size: 96px; font-weight: bold; }\n#fa {position:absolute; bottom:15px; left: 10px; font-size: 14px; }", ""]);
 
 	// exports
 
