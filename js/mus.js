@@ -1,11 +1,4 @@
 module.exports = function (options) {
-  var la = options.part ? Math.max(0, Math.min(24, options.part)) : 0;
-
-  var LONG = 1;
-  var MEDIUM_LONG = LONG * .5;
-  var MEDIUM = MEDIUM_LONG * .5;
-  var MEDIUM_SHORT = MEDIUM * .5;
-  var SHORT = MEDIUM_SHORT;
 
   var synth = new Tone.PolySynth(3, Tone.FMSynth).toMaster();
   synth.set({
@@ -48,34 +41,13 @@ module.exports = function (options) {
   crusher.connect(drumCompress);
 
   // lll
+  var la = options.part ? Math.max(0, Math.min(24, options.part)) : 0;
 
-
-  function drone(time) {
-    if (yes())
-      s2.triggerAttackRelease("C2", LONG, time, Math.random());
-    else
-      s2.triggerAttackRelease("G2", LONG, time, Math.random());
-    if (yes())
-      s2.triggerAttackRelease("C2", LONG, time, Math.random());
-    else
-      s2.triggerAttackRelease("G3", LONG, time, Math.random()); //:-()
-    if (yes())
-      s2.triggerAttackRelease("C1", LONG, time, Math.random());
-    else
-      s2.triggerAttackRelease("D2", LONG, time, Math.random()); //:-)(
-  }
-
-  function yes() {
-    return Math.random() < .5;
-  }
-
-  function rnd(r) {
-    return Math.floor(Math.random() * r);
-  }
-
-  function rvel() {
-    return Math.random() * .4 + .15;
-  }
+  var LONG = 1;
+  var MEDIUM_LONG = LONG * .5;
+  var MEDIUM = MEDIUM_LONG * .5;
+  var MEDIUM_SHORT = MEDIUM * .5;
+  var SHORT = MEDIUM_SHORT;
 
   var phrases = [];
   for (var i = 0; i < 5; i++) {
@@ -113,6 +85,7 @@ module.exports = function (options) {
       mod: rnd(3) + 2, vel: rvel()
     });
   }
+
   function gen_phrase(notes, octaves, mind, vard) {
     var phrase = [];
     var c = rnd(18) + 3;
@@ -151,6 +124,22 @@ module.exports = function (options) {
     }
   }
 
+  function drone(time) {
+    if (yes())
+      s2.triggerAttackRelease("C2", LONG, time, Math.random());
+    else
+      s2.triggerAttackRelease("G2", LONG, time, Math.random());
+    if (yes())
+      s2.triggerAttackRelease("C2", LONG, time, Math.random());
+    else
+      s2.triggerAttackRelease("G3", LONG, time, Math.random()); //:-()
+    if (yes())
+      s2.triggerAttackRelease("C1", LONG, time, Math.random());
+    else
+      s2.triggerAttackRelease("D2", LONG, time, Math.random()); //:-)(
+  }
+
+
   var m = 0;
   Tone.Transport.setInterval(function (time) {
     m++;
@@ -178,7 +167,9 @@ module.exports = function (options) {
     }
   }, LONG);
 
-  Tone.Transport.start();
+  Tone.Buffer.onload = function () {
+    Tone.Transport.start();
+  }
 
   function pause() {
     console.log("pause")
@@ -190,22 +181,26 @@ module.exports = function (options) {
     Tone.Transport.start();
   }
 
-  function next() {
-    la++;
+  function set_part(p) {
+    la = p;
     if (la > 24) la = 0;
-    update();
-  }
-
-  function prev() {
-    la--;
     if (la < 0) la = 24;
-    update();
   }
 
-  function update() {
-    if (options.update) {
-      options.update(la);
-    }
+  function get_part() {
+    return la;
+  }
+
+  function yes() {
+    return Math.random() < .5;
+  }
+
+  function rnd(r) {
+    return Math.floor(Math.random() * r);
+  }
+
+  function rvel() {
+    return Math.random() * .4 + .15;
   }
 
   window.addEventListener('focus', function () {
@@ -217,10 +212,7 @@ module.exports = function (options) {
   });
 
   return {
-    next: next,
-    prev: prev,
-    part: function () {
-      return la;
-    }
+    setPart: set_part,
+    part: get_part
   }
 }

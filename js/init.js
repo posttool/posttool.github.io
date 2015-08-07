@@ -1,42 +1,45 @@
-var image = require('./img');
-var music = require('./mus');
+var scenery = require('./img');
+var soundtrack = require('./mus');
 require('./main.css');
 
 $(document).on('ready', function () {
   var canvas = document.getElementById('menu_canvas');
   var context = canvas.getContext('2d');
-  var x = image(context);
-  x.animate();
-  var y = music({
+  var scene = scenery(context);
+  scene.animate();
+  var sound = soundtrack({
     part: localStorage.getItem('part'),
     interval: function (m) {
       if (m % 4 == 0) {
-        x.move();
+        scene.move();
       }
-    },
-    update: function () {
-      x.camera.position.z = 1000 + y.part() * 300;
-      $("#la").text(y.part());
     }
   });
-  $("#la").text(y.part());
+
+  function update(p) {
+    if (p) {
+      sound.setPart(p);
+      localStorage.setItem('part', p);
+    } else {
+      p = sound.part();
+    }
+    scene.camera.position.z = 1000 + p * 300;
+    $("#la").text(p);
+  }
+
 
   $(document).on('click', function () {
-    y.next();
-    localStorage.setItem('part', y.part());
+    update(sound.part() + 1);
   });
 
   $(window).on('keydown', function (e) {
     var code = e.keyCode ? e.keyCode : e.which;
     if (code == 38 || code == 39) {
-      y.next();
-      localStorage.setItem('part', y.part());
+      update(sound.part() + 1);
     }
     if (code == 37 || code == 40) {
-      y.prev();
-      localStorage.setItem('part', y.part());
+      update(sound.part() - 1);
     }
-    $("#la").text(y.part());
   });
 
 
@@ -47,4 +50,6 @@ $(document).on('ready', function () {
   }
 
   resizeCanvas();
+  update();
 });
+

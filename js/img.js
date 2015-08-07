@@ -44,11 +44,13 @@ module.exports = function (g2d) {
   }
 
   function get_box(p) {
+    var x_min = Math.min(p.v1.sx, p.v2.sx);
+    var y_min = Math.min(p.v1.sy, p.v2.sy);
     return {
-      x: Math.min(p.v1.sx, p.v2.sx),
-      y: Math.min(p.v1.sy, p.v2.sy),
-      w: Math.max(p.v1.sx, p.v2.sx) - x,
-      h: Math.max(p.v1.sy, p.v2.sy) - y
+      x: x_min,
+      y: y_min,
+      w: Math.max(p.v1.sx, p.v2.sx) - x_min,
+      h: Math.max(p.v1.sy, p.v2.sy) - y_min
     }
   }
 
