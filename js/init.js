@@ -7,22 +7,44 @@ $(document).on('ready', function () {
   var context = canvas.getContext('2d');
   var x = image(context);
   x.animate();
-  music({
+  var y = music({
+    part: localStorage.getItem('part'),
     interval: function (m) {
       if (m % 4 == 0) {
         x.move();
       }
     },
-    update: function (la) {
-      x.camera.position.z = 1000 + la * 300;
-      $("#la").text(la);
+    update: function () {
+      x.camera.position.z = 1000 + y.part() * 300;
+      $("#la").text(y.part());
     }
   });
+  $("#la").text(y.part());
 
-  window.addEventListener('resize', resizeCanvas, false);
+  $(document).on('click', function () {
+    y.next();
+    localStorage.setItem('part', y.part());
+  });
+
+  $(window).on('keydown', function (e) {
+    var code = e.keyCode ? e.keyCode : e.which;
+    if (code == 38 || code == 39) {
+      y.next();
+      localStorage.setItem('part', y.part());
+    }
+    if (code == 37 || code == 40) {
+      y.prev();
+      localStorage.setItem('part', y.part());
+    }
+    $("#la").text(y.part());
+  });
+
+
+  $(window).on('resize', resizeCanvas, false);
   function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   }
+
   resizeCanvas();
 });

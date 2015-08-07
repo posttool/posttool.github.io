@@ -1,4 +1,6 @@
 module.exports = function (options) {
+  var la = options.part ? Math.max(0, Math.min(24, options.part)) : 0;
+
   var LONG = 1;
   var MEDIUM_LONG = LONG * .5;
   var MEDIUM = MEDIUM_LONG * .5;
@@ -47,21 +49,24 @@ module.exports = function (options) {
 
   // lll
 
-  var la = 0;
 
   function drone(time) {
-    if (Math.random() < .5)
+    if (yes())
       s2.triggerAttackRelease("C2", LONG, time, Math.random());
     else
       s2.triggerAttackRelease("G2", LONG, time, Math.random());
-    if (Math.random() < .5)
+    if (yes())
       s2.triggerAttackRelease("C2", LONG, time, Math.random());
     else
       s2.triggerAttackRelease("G3", LONG, time, Math.random()); //:-()
-    if (Math.random() < .5)
+    if (yes())
       s2.triggerAttackRelease("C1", LONG, time, Math.random());
     else
       s2.triggerAttackRelease("D2", LONG, time, Math.random()); //:-)(
+  }
+
+  function yes() {
+    return Math.random() < .5;
   }
 
   function rnd(r) {
@@ -110,7 +115,7 @@ module.exports = function (options) {
   }
   function gen_phrase(notes, octaves, mind, vard) {
     var phrase = [];
-    var c = Math.floor(Math.random() * 18) + 3;
+    var c = rnd(18) + 3;
     for (var i = 0; i < c; i++) {
       var d = mind + (vard * rnd(c - 3));
       if (rnd(10) < 3)
@@ -126,7 +131,6 @@ module.exports = function (options) {
       var note = phrase[i].note;
       if (note)
         synth.triggerAttackRelease(note, phrase[i].duration, time, vel * .333);
-
       time += phrase[i].duration;
     }
   }
@@ -154,7 +158,6 @@ module.exports = function (options) {
       drone(time);
       drone(time + MEDIUM_LONG);
     }
-
     for (var i = Math.max(0, la - 5); i < la; i++) {
       if (m % phrases[i].mod == 0) {
         var s = i % 3 == 2 ? s3 : synth;
@@ -170,36 +173,32 @@ module.exports = function (options) {
     if (la > 18) {
       kick.triggerAttack(0, time);
     }
-
     if (options.interval) {
       options.interval(m);
     }
-
-
   }, LONG);
 
-  //start the transport
   Tone.Transport.start();
 
   function pause() {
+    console.log("pause")
     Tone.Transport.stop();
   }
 
   function play() {
+    console.log("play")
     Tone.Transport.start();
   }
 
   function next() {
     la++;
     if (la > 24) la = 0;
-    localStorage.setItem('la', la);
     update();
   }
 
   function prev() {
     la--;
     if (la < 0) la = 24;
-    localStorage.setItem('la', la);
     update();
   }
 
@@ -209,27 +208,6 @@ module.exports = function (options) {
     }
   }
 
-  $(document).on('click', function () {
-    next();
-  });
-  window.onkeydown = function (e) {
-    var code = e.keyCode ? e.keyCode : e.which;
-    if (code == 38 || code == 39) {
-      next();
-    }
-    if (code == 37 || code == 40) {
-      prev();
-    }
-    $("#la").text(la);
-  };
-  var lola = localStorage.getItem('la');
-  if (lola) {
-    la = lola;
-    update();
-  }
-
-
-  // unfocus
   window.addEventListener('focus', function () {
     play();
   });
@@ -237,4 +215,12 @@ module.exports = function (options) {
   window.addEventListener('blur', function () {
     pause();
   });
+
+  return {
+    next: next,
+    prev: prev,
+    part: function () {
+      return la;
+    }
+  }
 }
