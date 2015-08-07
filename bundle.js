@@ -44,386 +44,397 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(1);
-	__webpack_require__(2);
+	var image = __webpack_require__(1);
+	var music = __webpack_require__(2);
 	__webpack_require__(3);
+
+	$(document).on('ready', function () {
+	  var canvas = document.getElementById('menu_canvas');
+	  var context = canvas.getContext('2d');
+	  var x = image(context);
+	  x.animate();
+	  music({
+	    interval: function (m) {
+	      if (m % 4 == 0) {
+	        x.move();
+	      }
+	    },
+	    update: function (la) {
+	      x.camera.position.z = 1000 + la * 300;
+	      $("#la").text(la);
+	    }
+	  });
+
+	  window.addEventListener('resize', resizeCanvas, false);
+	  function resizeCanvas() {
+	    canvas.width = window.innerWidth;
+	    canvas.height = window.innerHeight;
+	  }
+	  resizeCanvas();
+	});
 
 /***/ },
 /* 1 */
 /***/ function(module, exports) {
 
-	$(document).on('ready', function(){
-	    var LONG = 1;
-	    var MEDIUM_LONG = LONG * .5;
-	    var MEDIUM = MEDIUM_LONG * .5;
-	    var MEDIUM_SHORT = MEDIUM * .5;
-	    var SHORT = MEDIUM_SHORT;
+	module.exports = function (g2d) {
+	  var S = 100, OX = 590, OY = 420,
+	    mouseX = 0, mouseY = 0,
+	    renderBox = 1, renderBoxAt = 1;
 
-	    var canvas = document.getElementById('menu_canvas');
-	    var context = canvas.getContext('2d');
+	  var projector = new THREE.Projector();
+	  var camera = new THREE.Camera(11, 1, 1, 10000);
+	  camera.position.z = 1000;
 
-	    var x = xmenu(context);
-	    x.animate();
+	  var scene = new THREE.Scene();
+	  var geometry = new THREE.Geometry();
+	  for (var i = 0; i < 16; i++) {
+	    geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(get_r(), get_r(), get_r())));
+	  }
+	  var line = new THREE.Line(geometry);
+	  scene.addObject(line);
 
-	    var synth = new Tone.PolySynth(3, Tone.FMSynth).toMaster();
-	    synth.set({
-	        envelope : {attack : 0.03, sustain: .01},
-	        carrier: { oscillator: {type: 'square'}, filter: {type: 'lowpass'} },
-	        volume: -10
-	    });
-
-	    var s2 = new Tone.PolySynth(3, Tone.AMSynth).toMaster();
-	    var s3 = new Tone.PolySynth(3, Tone.MonoSynth).toMaster();
-	    s3.set({
-	        envelope: {attack : .3, sustain: .01, decay: .05, release: .1},
-	        oscillator: {type: 'triangle'}, filter: {type: 'highpass', freq:300} ,
-	        volume: -5,
-	        // detune: {value: 261.6}
-	    });
-
-	    var crusher = new Tone.Distortion({
-	        distortion : 0.1,
-	        wet : 0.5
-	    });
-	    var hats = new Tone.Sampler("./audio/505/hh.mp3", {
-	        volume : -10,
-	        envelope : {attack : 0.001, decay : 0.02, sustain : 0.01, release : 0.01},
-	        filterEnvelope : {attack : 0.001, decay : 0.02, sustain : 1, min : 6000, max : 600},
-	        filter : {type: 'highpass', freq: 500}
-	    }).connect(crusher);
-	    var snare = new Tone.Sampler("./audio/505/snare.mp3", {
-	        envelope : {attack : 0.01, decay : 0.05, sustain : 0},
-	        filterEnvelope : {attack : 0.001, decay : 0.01, sustain : 0, min : 3000, max : 10000},
-	        filter : {type: 'lowpass', freq:700}
-	    }).connect(crusher);
-	    var kick = new Tone.Sampler("./audio/505/kick.mp3", {
-	        volume: -8
-	    });
-	    var eq = new Tone.EQ3(4, 5, 0);
-	    kick.connect(eq);
-	    var drumCompress = new Tone.Compressor({threshold : -20, ratio : 6, attack : 0.01, release : 0.01}).toMaster();
-	    eq.connect(drumCompress);
-	    crusher.connect(drumCompress);
-
-	    // lll
-
-	    var la = 0;
-	    function drone(time){
-	        if (Math.random()<.5)
-	           s2.triggerAttackRelease("C2", LONG, time, Math.random());
-	        else
-	           s2.triggerAttackRelease("G2", LONG, time, Math.random());
-	        if (Math.random()<.5)
-	           s2.triggerAttackRelease("C2", LONG, time, Math.random());
-	        else
-	           s2.triggerAttackRelease("G3", LONG, time, Math.random()); //:-()
-	        if (Math.random()<.5)
-	           s2.triggerAttackRelease("C1", LONG, time, Math.random());
-	        else
-	           s2.triggerAttackRelease("D2", LONG, time, Math.random()); //:-)(
+	  return {
+	    camera: camera,
+	    animate: animate,
+	    move: function (node) {
+	      mouseX = Math.random() * 2 * Math.PI - Math.PI;
+	      mouseY = Math.random() * 2 * Math.PI - Math.PI;
 	    }
-	    function rnd(r){
-	        return Math.floor(Math.random()*r);
-	    }
-	    function rvel(){
-	        return Math.random()*.4+.15;
-	    }
-	    var phrases = [];
-	    for (var i=0; i<5; i++) {
-	        phrases.push({phrase: 
-	            gen_phrase(['C','C','C','G','G','G','D','D','B'], 
-	            ['2', '3','3','4'], MEDIUM_LONG, 0), 
-	        mod: rnd(4)+4, vel: rvel()});
-	    }
-	    for (var i=0; i<5; i++) {
-	        phrases.push({phrase: 
-	            gen_phrase(['C','C','C','G','G','G','D','D','B','B'], 
-	            ['2', '3','3','4','4','4'], MEDIUM, 0), 
-	        mod: rnd(3)+2, vel: rvel()});
-	    }
-	    for (var i=0; i<5; i++) {
-	        phrases.push({phrase: 
-	            gen_phrase(['C','C','C','G','G','G','D','D','B','B','A','A'], 
-	            ['3','3','4','4','4','5'], MEDIUM_SHORT, MEDIUM_SHORT), 
-	        mod: rnd(3)+2, vel: rvel()});
-	    }
-	    for (var i=0; i<5; i++) {
-	        phrases.push({phrase: 
-	            gen_phrase(['C','C','C','G','G','G','D','D','B','B'], 
-	            ['2', '3','3','4','4','4'], MEDIUM, 0), 
-	        mod: rnd(3)+2, vel: rvel()});
-	    }
-	   for (var i=0; i<5; i++) {
-	        phrases.push({phrase: 
-	            gen_phrase(['C','C','C','G','G','G','D','D','B','B','A','A'], 
-	            ['3','3','4','4','4','5','5'], MEDIUM_SHORT, SHORT), 
-	        mod: rnd(3)+2, vel: rvel()});
-	    }
-	    function gen_phrase(notes,octaves,mind,vard){
-	        var phrase = [];
-	        var c = Math.floor(Math.random()*18)+3;
-	        for (var i=0; i<c; i++){
-	            var d = mind + (vard * rnd(c-3));
-	            if (rnd(10)<3)
-	                phrase.push({note: null, duration: d});
-	            else
-	                phrase.push({note: notes[rnd(notes.length)]+octaves[rnd(octaves.length)], duration: d});
-	        }
-	        return phrase;
-	    }
-	    function m1(synth, time, phrase, vel){
-	        for (var i=0; i<phrase.length; i++){
-	            var note = phrase[i].note;
-	            if (note)
-	                synth.triggerAttackRelease(note, phrase[i].duration, time, vel*.333);
-	            
-	            time += phrase[i].duration;
-	        }
-	    }
-	    function snarez(time, s){
-	        var r = rnd(3)+3;
-	        for (var i=0; i<r; i++) {
-	            if (rnd(10)>5)
-	                snare.triggerAttackRelease(0, SHORT, time+i*SHORT, s);
-	        }
-	    }
-	    function hatz(time, s){
-	        var r = rnd(16)+3;
-	        for (var i=0; i<r; i++) {
-	            if (i==0 || rnd(10)>3)
-	               hats.triggerAttackRelease(0, SHORT, time+i*SHORT, s);
-	        }
-	    }
+	  }
 
-	    var m = 0;
-	    Tone.Transport.setInterval(function(time){
-	        m++;
-	        if (la<8 || la>15) {
-	            drone(time);
-	            drone(time+MEDIUM_LONG);
-	        }
+	  function get_r() {
+	    return (Math.random() * 2 - 1) * 1500;
+	  }
 
-	        for (var i=Math.max(0,la-5); i<la; i++) {
-	            if (m%phrases[i].mod == 0) {
-	                var s = i%3 == 2 ? s3 : synth;
-	                m1(s, time, phrases[i].phrase, phrases[i].vel);
-	            }
-	        }
-	        if (la>10) {
-	            hatz(time, .01*(la-8));
-	        }
-	        if (la>12) {
-	            snarez(time ,.1);
-	        }
-	        if (la>18) {
-	            kick.triggerAttack(0, time);
-	        }
-	        if (m%4==0) {
-	            x.move();
-	        }
+	  function get_yr() {
+	    var y = Math.random() < .5 ? 120 : -100;
+	    y += (Math.random() * 2 - 1) * 10;
+	    return y;
+	  }
 
-	    }, LONG);
+	  function get_cr() {
+	    return Math.floor(Math.random() * 0xff);
+	  }
 
-	    //start the transport
-	    Tone.Transport.start();
+	  function render_line(v1, v2) {
+	    g2d.globalAlpha = .05;
+	    //setBlending( material.blending );
 
-	    function pause() {
-	        Tone.Transport.stop();
+	    g2d.beginPath();
+	    g2d.moveTo(v1.sx, v1.sy);
+	    g2d.lineTo(v2.sx, v2.sy);
+	    g2d.closePath();
+
+	    g2d.lineWidth = 1;
+	    g2d.lineCap = "square";
+	    g2d.lineJoin = "miter";
+	    g2d.strokeStyle = "white";
+	    g2d.stroke();
+	  }
+
+	  function get_box(p) {
+	    var v1 = {x: Math.min(p.v1.sx, p.v2.sx), y: Math.min(p.v1.sy, p.v2.sy)},
+	      v2 = {x: Math.max(p.v1.sx, p.v2.sx), y: Math.max(p.v1.sy, p.v2.sy)};
+
+	    var x = v1.x;
+	    var y = v1.y;
+	    var w = v2.x - x;
+	    var h = v2.y - y;
+
+	    return {x: x, y: y, w: w, h: h};
+	  }
+
+	  function render_box(p, color, alpha) {
+	    var b = get_box(p);
+	    g2d.globalAlpha = alpha * renderBoxAt;
+	    g2d.fillStyle = color;
+	    g2d.fillRect(b.x, b.y, b.w, b.h);
+	    renderBoxAt += (renderBox - renderBoxAt) * .1;
+	  }
+
+	  function render() {
+	    camera.position.x += ( mouseX - camera.position.x ) * .05;
+	    camera.position.y += ( -mouseY + 200 - camera.position.y ) * .05;
+	    line.rotation.y += ( mouseX - line.rotation.y ) * .005;
+
+	    var renderList = projector.projectScene(scene, camera, false);
+	    for (var e = 0, el = renderList.length; e < el; e++) {
+	      var element = renderList[e];
+	      element.v1.sx = element.v1.positionScreen.x * S + OX;
+	      element.v1.sy = element.v1.positionScreen.y * S + OY;
+	      element.v2.sx = element.v2.positionScreen.x * S + OX;
+	      element.v2.sy = element.v2.positionScreen.y * S + OY;
 	    }
-	    function play() {
-	        Tone.Transport.start();
+	    for (var e = 0; e < renderList.length; e++) {
+	      var el = renderList[e];
+
+	      render_line(el.v1, el.v2);
+	      for (var e0 = 0; e0 < e; e0++) {
+	        var e1 = renderList[e0];
+	        render_line(el.v1, e1.v2);
+	      }
+	      if (Math.random() < .5)
+	        render_box(renderList[e], "#ffffff", .02);
+	      else {
+	        var ccc = Math.floor(camera.position.z * .02);
+	        render_box(renderList[e], "rgb(" + ccc + "," + ccc + "," + ccc + ")", .02);
+	      }
+
 	    }
+	    g2d.globalAlpha = 1;
+	  }
 
-	    function next(){
-	        la++;
-	        if (la>24) la=0;
-	        localStorage.setItem('la', la);
-	        update();
-	    }
-	    function prev(){
-	        la--;
-	        if (la<0) la =24;
-	        localStorage.setItem('la', la);
-	        update();
-	    }
-	    function update(){
-	        x.camera.position.z = 1000 + la * 300;
-	        $("#la").text(la);
-	    }
+	  function animate() {
+	    requestAnimationFrame(animate);
+	    render();
+	  }
 
-	    $(document).on('click', function(){ 
-	       next();
-	    });
-	    window.onkeydown = function (e) {
-	        var code = e.keyCode ? e.keyCode : e.which;
-	        if (code==38 || code==39){
-	            next();
-	        }
-	        if (code==37||code==40){
-	            prev();
-	        }
-	         $("#la").text(la);
-	   };
-	   var lola = localStorage.getItem('la');
-	   if (lola) {
-	     la = lola;
-	     update();
-	   }
-
-	   
-
-
-	    // resize
-	    window.addEventListener('resize', resizeCanvas, false);
-
-	    function resizeCanvas() {
-	            canvas.width = window.innerWidth;
-	            canvas.height = window.innerHeight;
-	            
-	    }
-	    resizeCanvas();
-
-	    // unfocus
-	    window.addEventListener('focus', function() {
-	        play();
-	    });
-
-	    window.addEventListener('blur', function() {
-	        pause();
-	    });
-	});
+	}
 
 /***/ },
 /* 2 */
 /***/ function(module, exports) {
 
-	xmenu = function(g2d)
-	{
-	    var S = 100, OX = 590, OY = 420,
-	    mouseX = 0, mouseY = 0,
-	    renderBox = 1, renderBoxAt = 1;
-	    
-	    
-	    var projector = new THREE.Projector();
-	    var camera = new THREE.Camera( 11, 1, 1, 10000 );
-	    camera.position.z = 1000;
+	module.exports = function (options) {
+	  var LONG = 1;
+	  var MEDIUM_LONG = LONG * .5;
+	  var MEDIUM = MEDIUM_LONG * .5;
+	  var MEDIUM_SHORT = MEDIUM * .5;
+	  var SHORT = MEDIUM_SHORT;
 
-	    var scene = new THREE.Scene();
-	    var geometry = new THREE.Geometry();
-	    for ( var i = 0; i < 16; i ++ ) 
-	    {
-	        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(get_r(),get_r(),get_r()) )  );
-	    }
-	    var line = new THREE.Line( geometry );
-	    scene.addObject( line );
+	  var synth = new Tone.PolySynth(3, Tone.FMSynth).toMaster();
+	  synth.set({
+	    envelope: {attack: 0.03, sustain: .01},
+	    carrier: {oscillator: {type: 'square'}, filter: {type: 'lowpass'}},
+	    volume: -10
+	  });
 
-	    return {
-	        camera: camera,
-	        animate: animate,
-	        move: function(node)
-	        { 
-	            mouseX = Math.random()*2*Math.PI - Math.PI; 
-	            mouseY = Math.random()*2*Math.PI - Math.PI; 
-	        }
+	  var s2 = new Tone.PolySynth(3, Tone.AMSynth).toMaster();
+	  var s3 = new Tone.PolySynth(3, Tone.MonoSynth).toMaster();
+	  s3.set({
+	    envelope: {attack: .3, sustain: .01, decay: .05, release: .1},
+	    oscillator: {type: 'triangle'}, filter: {type: 'highpass', freq: 300},
+	    volume: -5,
+	    // detune: {value: 261.6}
+	  });
+
+	  var crusher = new Tone.Distortion({
+	    distortion: 0.1,
+	    wet: 0.5
+	  });
+	  var hats = new Tone.Sampler("./audio/505/hh.mp3", {
+	    volume: -10,
+	    envelope: {attack: 0.001, decay: 0.02, sustain: 0.01, release: 0.01},
+	    filterEnvelope: {attack: 0.001, decay: 0.02, sustain: 1, min: 6000, max: 600},
+	    filter: {type: 'highpass', freq: 500}
+	  }).connect(crusher);
+	  var snare = new Tone.Sampler("./audio/505/snare.mp3", {
+	    envelope: {attack: 0.01, decay: 0.05, sustain: 0},
+	    filterEnvelope: {attack: 0.001, decay: 0.01, sustain: 0, min: 3000, max: 10000},
+	    filter: {type: 'lowpass', freq: 700}
+	  }).connect(crusher);
+	  var kick = new Tone.Sampler("./audio/505/kick.mp3", {
+	    volume: -8
+	  });
+	  var eq = new Tone.EQ3(4, 5, 0);
+	  kick.connect(eq);
+	  var drumCompress = new Tone.Compressor({threshold: -20, ratio: 6, attack: 0.01, release: 0.01}).toMaster();
+	  eq.connect(drumCompress);
+	  crusher.connect(drumCompress);
+
+	  // lll
+
+	  var la = 0;
+
+	  function drone(time) {
+	    if (Math.random() < .5)
+	      s2.triggerAttackRelease("C2", LONG, time, Math.random());
+	    else
+	      s2.triggerAttackRelease("G2", LONG, time, Math.random());
+	    if (Math.random() < .5)
+	      s2.triggerAttackRelease("C2", LONG, time, Math.random());
+	    else
+	      s2.triggerAttackRelease("G3", LONG, time, Math.random()); //:-()
+	    if (Math.random() < .5)
+	      s2.triggerAttackRelease("C1", LONG, time, Math.random());
+	    else
+	      s2.triggerAttackRelease("D2", LONG, time, Math.random()); //:-)(
+	  }
+
+	  function rnd(r) {
+	    return Math.floor(Math.random() * r);
+	  }
+
+	  function rvel() {
+	    return Math.random() * .4 + .15;
+	  }
+
+	  var phrases = [];
+	  for (var i = 0; i < 5; i++) {
+	    phrases.push({
+	      phrase: gen_phrase(['C', 'C', 'C', 'G', 'G', 'G', 'D', 'D', 'B'],
+	        ['2', '3', '3', '4'], MEDIUM_LONG, 0),
+	      mod: rnd(4) + 4, vel: rvel()
+	    });
+	  }
+	  for (var i = 0; i < 5; i++) {
+	    phrases.push({
+	      phrase: gen_phrase(['C', 'C', 'C', 'G', 'G', 'G', 'D', 'D', 'B', 'B'],
+	        ['2', '3', '3', '4', '4', '4'], MEDIUM, 0),
+	      mod: rnd(3) + 2, vel: rvel()
+	    });
+	  }
+	  for (var i = 0; i < 5; i++) {
+	    phrases.push({
+	      phrase: gen_phrase(['C', 'C', 'C', 'G', 'G', 'G', 'D', 'D', 'B', 'B', 'A', 'A'],
+	        ['3', '3', '4', '4', '4', '5'], MEDIUM_SHORT, MEDIUM_SHORT),
+	      mod: rnd(3) + 2, vel: rvel()
+	    });
+	  }
+	  for (var i = 0; i < 5; i++) {
+	    phrases.push({
+	      phrase: gen_phrase(['C', 'C', 'C', 'G', 'G', 'G', 'D', 'D', 'B', 'B'],
+	        ['2', '3', '3', '4', '4', '4'], MEDIUM, 0),
+	      mod: rnd(3) + 2, vel: rvel()
+	    });
+	  }
+	  for (var i = 0; i < 5; i++) {
+	    phrases.push({
+	      phrase: gen_phrase(['C', 'C', 'C', 'G', 'G', 'G', 'D', 'D', 'B', 'B', 'A', 'A'],
+	        ['3', '3', '4', '4', '4', '5', '5'], MEDIUM_SHORT, SHORT),
+	      mod: rnd(3) + 2, vel: rvel()
+	    });
+	  }
+	  function gen_phrase(notes, octaves, mind, vard) {
+	    var phrase = [];
+	    var c = Math.floor(Math.random() * 18) + 3;
+	    for (var i = 0; i < c; i++) {
+	      var d = mind + (vard * rnd(c - 3));
+	      if (rnd(10) < 3)
+	        phrase.push({note: null, duration: d});
+	      else
+	        phrase.push({note: notes[rnd(notes.length)] + octaves[rnd(octaves.length)], duration: d});
 	    }
-	    
-	    function get_r()
-	    {
-	        return (Math.random() * 2 - 1)*1500;
+	    return phrase;
+	  }
+
+	  function m1(synth, time, phrase, vel) {
+	    for (var i = 0; i < phrase.length; i++) {
+	      var note = phrase[i].note;
+	      if (note)
+	        synth.triggerAttackRelease(note, phrase[i].duration, time, vel * .333);
+
+	      time += phrase[i].duration;
 	    }
-	    
-	    function get_yr()
-	    {
-	        var y = Math.random() < .5 ? 120 : -100;
-	        y += (Math.random() * 2 - 1)*10;
-	        return y;
+	  }
+
+	  function snarez(time, s) {
+	    var r = rnd(3) + 3;
+	    for (var i = 0; i < r; i++) {
+	      if (rnd(10) > 5)
+	        snare.triggerAttackRelease(0, SHORT, time + i * SHORT, s);
 	    }
-	    function get_cr(){
-	        return Math.floor(Math.random()*0xff);
+	  }
+
+	  function hatz(time, s) {
+	    var r = rnd(16) + 3;
+	    for (var i = 0; i < r; i++) {
+	      if (i == 0 || rnd(10) > 3)
+	        hats.triggerAttackRelease(0, SHORT, time + i * SHORT, s);
 	    }
-	    
-	    function render_line( v1, v2 ) 
-	    {
-	        g2d.globalAlpha = .05;
-	        //setBlending( material.blending );
-	    
-	        g2d.beginPath();
-	        g2d.moveTo( v1.sx, v1.sy );
-	        g2d.lineTo( v2.sx, v2.sy );
-	        g2d.closePath();
-	    
-	        g2d.lineWidth = 1;
-	        g2d.lineCap = "square";
-	        g2d.lineJoin = "miter";
-	        g2d.strokeStyle = "white";
-	        g2d.stroke();
-	    }
-	    
-	    function get_box(p)
-	    {
-	        var v1 = { x: Math.min(p.v1.sx,p.v2.sx), y: Math.min(p.v1.sy,p.v2.sy) }, 
-	            v2 = { x: Math.max(p.v1.sx,p.v2.sx), y: Math.max(p.v1.sy,p.v2.sy) };
-	        
-	        var x = v1.x;
-	        var y = v1.y;
-	        var w = v2.x - x;
-	        var h = v2.y - y;
-	        
-	        return {x:x,y:y,w:w,h:h};
-	    }
-	    
-	    function render_box(p,color,alpha)
-	    {
-	        var b = get_box(p);
-	        g2d.globalAlpha = alpha * renderBoxAt;
-	        g2d.fillStyle = color;
-	        g2d.fillRect(b.x, b.y, b.w, b.h);
-	        renderBoxAt += (renderBox - renderBoxAt)*.1;
-	    }
-	    
-	    function render() 
-	    {
-	        camera.position.x += ( mouseX - camera.position.x ) * .05;
-	        camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
-	        line.rotation.y += ( mouseX  - line.rotation.y ) * .005;
-	        
-	        var renderList = projector.projectScene( scene, camera, false );
-	        for (var e = 0, el = renderList.length; e < el; e++ ) 
-	        {
-	            var element = renderList[ e ];
-	            element.v1.sx = element.v1.positionScreen.x*S+OX;
-	            element.v1.sy = element.v1.positionScreen.y*S+OY;
-	            element.v2.sx = element.v2.positionScreen.x*S+OX;
-	            element.v2.sy = element.v2.positionScreen.y*S+OY;
-	        }
-	        for (var e = 0; e < renderList.length; e++ ) 
-	        {
-	            var el = renderList[ e ];
-	        
-	            render_line( el.v1, el.v2);
-	            for (var e0 = 0; e0 < e; e0++)
-	            {
-	                var e1 = renderList[ e0 ];
-	                render_line( el.v1, e1.v2);
-	            }
-	            if (Math.random()<.5)
-	                render_box(renderList[e], "#ffffff", .02);
-	            else{
-	                var ccc = Math.floor(camera.position.z*.02);
-	                render_box(renderList[e], "rgb("+ccc+","+ccc+","+ccc+")", .02);
-	            }
-	            
-	        }
-	        g2d.globalAlpha = 1;
+	  }
+
+	  var m = 0;
+	  Tone.Transport.setInterval(function (time) {
+	    m++;
+	    if (la < 8 || la > 15) {
+	      drone(time);
+	      drone(time + MEDIUM_LONG);
 	    }
 
-	    function animate() 
-	    {
-	        requestAnimationFrame( animate );
-	        render();
+	    for (var i = Math.max(0, la - 5); i < la; i++) {
+	      if (m % phrases[i].mod == 0) {
+	        var s = i % 3 == 2 ? s3 : synth;
+	        m1(s, time, phrases[i].phrase, phrases[i].vel);
+	      }
 	    }
-	    
-	    
+	    if (la > 10) {
+	      hatz(time, .01 * (la - 8));
+	    }
+	    if (la > 12) {
+	      snarez(time, .1);
+	    }
+	    if (la > 18) {
+	      kick.triggerAttack(0, time);
+	    }
+
+	    if (options.interval) {
+	      options.interval(m);
+	    }
+
+
+	  }, LONG);
+
+	  //start the transport
+	  Tone.Transport.start();
+
+	  function pause() {
+	    Tone.Transport.stop();
+	  }
+
+	  function play() {
+	    Tone.Transport.start();
+	  }
+
+	  function next() {
+	    la++;
+	    if (la > 24) la = 0;
+	    localStorage.setItem('la', la);
+	    update();
+	  }
+
+	  function prev() {
+	    la--;
+	    if (la < 0) la = 24;
+	    localStorage.setItem('la', la);
+	    update();
+	  }
+
+	  function update() {
+	    if (options.update) {
+	      options.update(la);
+	    }
+	  }
+
+	  $(document).on('click', function () {
+	    next();
+	  });
+	  window.onkeydown = function (e) {
+	    var code = e.keyCode ? e.keyCode : e.which;
+	    if (code == 38 || code == 39) {
+	      next();
+	    }
+	    if (code == 37 || code == 40) {
+	      prev();
+	    }
+	    $("#la").text(la);
+	  };
+	  var lola = localStorage.getItem('la');
+	  if (lola) {
+	    la = lola;
+	    update();
+	  }
+
+
+	  // unfocus
+	  window.addEventListener('focus', function () {
+	    play();
+	  });
+
+	  window.addEventListener('blur', function () {
+	    pause();
+	  });
 	}
 
 /***/ },
