@@ -1,14 +1,15 @@
 module.exports = function (options) {
+  var mc = new Tone.Compressor(-20, 2.5).toMaster();
 
-  var synth = new Tone.PolySynth(3, Tone.FMSynth).toMaster();
+  var synth = new Tone.PolySynth(3, Tone.FMSynth).connect(mc);
   synth.set({
     envelope: {attack: 0.03, sustain: .01},
     carrier: {oscillator: {type: 'square'}, filter: {type: 'lowpass'}},
     volume: -10
   });
 
-  var s2 = new Tone.PolySynth(3, Tone.AMSynth).toMaster();
-  var s3 = new Tone.PolySynth(3, Tone.MonoSynth).toMaster();
+  var s2 = new Tone.PolySynth(3, Tone.AMSynth).connect(mc);
+  var s3 = new Tone.PolySynth(3, Tone.MonoSynth).connect(mc);
   s3.set({
     envelope: {attack: .3, sustain: .01, decay: .05, release: .1},
     oscillator: {type: 'triangle'}, filter: {type: 'highpass', freq: 300},
@@ -36,7 +37,7 @@ module.exports = function (options) {
   });
   var eq = new Tone.EQ3(4, 5, 0);
   kick.connect(eq);
-  var drumCompress = new Tone.Compressor({threshold: -20, ratio: 6, attack: 0.01, release: 0.01}).toMaster();
+  var drumCompress = new Tone.Compressor({threshold: -20, ratio: 6, attack: 0.01, release: 0.01}).connect(mc);
   eq.connect(drumCompress);
   crusher.connect(drumCompress);
 
@@ -173,7 +174,7 @@ module.exports = function (options) {
 
   function pause() {
     console.log("pause")
-    Tone.Transport.stop();
+   // Tone.Transport.stop();
   }
 
   function play() {

@@ -10,9 +10,8 @@ $(document).on('ready', function () {
   var sound = soundtrack({
     part: localStorage.getItem('part'),
     interval: function (m) {
-      if (m % 4 == 0) {
+      if (m % 4 == 0)
         scene.move();
-      }
     }
   });
 
@@ -24,7 +23,7 @@ $(document).on('ready', function () {
       p = sound.part();
     }
     scene.camera.position.z = 1000 + p * 300;
-    $("#la").text(p);
+    $('#la').text(p);
   }
 
   $(document).on('click', function () {
@@ -47,7 +46,7 @@ $(document).on('ready', function () {
     canvas.height = window.innerHeight;
   }
 
-  $(window).on("touchstart", function (e) {
+  $(window).on('touchstart', function (e) {
     e.preventDefault();
     Tone.startMobile();
   });
