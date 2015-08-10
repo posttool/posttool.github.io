@@ -2,8 +2,14 @@
 html, body { width:100%; height:100%; } 
 canvas { display:block; } 
 div { font-family: sans-serif; color: black; }
+p { margin-bottom: 8px; }
 a { color: #666;}
 a:visited { color: #000;}
-#la {position:absolute; top:10px; left:10px; font-size: 96px; font-weight: bold; }
-#fa {position:absolute; bottom:15px; left: 15px; padding: 22px; background-color:#fff; width:700px; height:30px;
-font-size: 11px; line-height: 16px;}
+#la { position:absolute; top:10px; left:10px; font-size: 96px; font-weight: bold; }
+#fa { 
+	position:absolute; bottom:15px; left: 15px; 
+	padding: 22px 96px 0 22px; background-color:#fff; 
+	width:700px; height:400px;
+    font-size: 14px; line-height: 18px;
+    overflow: auto;
+}

@@ -38,6 +38,12 @@ $(document).on('ready', function () {
     if (code == 37 || code == 40) {
       update(sound.part() - 1);
     }
+    if (code == 32) {
+      if ($('#fa').css('display') == 'none')
+        $('#fa').show();
+      else
+        $('#fa').hide();
+    }
   });
 
   $(window).on('resize', resizeCanvas, false);
