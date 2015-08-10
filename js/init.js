@@ -39,10 +39,14 @@ $(document).on('ready', function () {
       update(sound.part() - 1);
     }
     if (code == 32) {
-      if ($('#fa').css('display') == 'none')
+      if ($('#fa').css('display') == 'none') {
         $('#fa').show();
-      else
+        sound.pause();
+      }
+      else {
         $('#fa').hide();
+        sound.play();
+      }
     }
   });
 

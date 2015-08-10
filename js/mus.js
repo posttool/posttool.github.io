@@ -13,8 +13,7 @@ module.exports = function (options) {
   s3.set({
     envelope: {attack: .3, sustain: .01, decay: .05, release: .1},
     oscillator: {type: 'triangle'}, filter: {type: 'highpass', freq: 300},
-    volume: -5,
-    // detune: {value: 261.6}
+    volume: -5
   });
 
   var crusher = new Tone.Distortion({
@@ -168,18 +167,20 @@ module.exports = function (options) {
     }
   }, LONG);
 
-  Tone.Buffer.onload = function () {
-    Tone.Transport.start();
-  }
+  // Tone.Buffer.onload = function () {
+  //   Tone.Transport.start();
+  // }
 
   function pause() {
     console.log("pause")
     Tone.Transport.stop();
+    Tone.Master.mute = true; 
   }
 
   function play() {
     console.log("play")
     Tone.Transport.start();
+    Tone.Master.mute = false; 
   }
 
   function set_part(p) {
@@ -213,6 +214,8 @@ module.exports = function (options) {
   });
 
   return {
+    play: play,
+    pause: pause,
     setPart: set_part,
     part: get_part
   }
