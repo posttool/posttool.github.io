@@ -174,7 +174,7 @@ module.exports = function (options) {
 
   function pause() {
     console.log("pause")
-   // Tone.Transport.stop();
+    Tone.Transport.stop();
   }
 
   function play() {
