@@ -63,5 +63,6 @@ $(document).on('ready', function () {
 
   resizeCanvas();
   update();
+  scene.move();
 });
 
