@@ -26,6 +26,10 @@ $(document).on('ready', function () {
     $('#la').text(p);
   }
 
+  function is_text_hidden(){
+    return $('#fa').css('display') == 'none';
+  }
+
   $(document).on('click', function () {
     update(sound.part() + 1);
   });
@@ -39,7 +43,7 @@ $(document).on('ready', function () {
       update(sound.part() - 1);
     }
     if (code == 32) {
-      if ($('#fa').css('display') == 'none') {
+      if (is_text_hidden()) {
         $('#fa').show();
         sound.pause();
       }
@@ -56,10 +60,10 @@ $(document).on('ready', function () {
     canvas.height = window.innerHeight;
   }
 
-  $(window).on('touchstart', function (e) {
-    e.preventDefault();
-    Tone.startMobile();
-  });
+  //$(window).on('touchstart', function (e) {
+  //  e.preventDefault();
+  //  Tone.startMobile();
+  //});
 
   resizeCanvas();
   update();
