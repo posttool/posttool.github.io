@@ -1,7 +1,7 @@
 var random = require('./rnd');
 
 module.exports = function (options) {
-  var min_vol = -86;
+  var min_vol = -106;
   var vol = new Tone.Volume(min_vol).toMaster();
   var mc = new Tone.Compressor(-20, 2.5).connect(vol);
   var s1 = new Tone.PolySynth(3, Tone.FMSynth).connect(mc);
@@ -172,7 +172,10 @@ module.exports = function (options) {
   function pause() {
     vol.volume.rampTo(min_vol, 1);
     is_playing = false;
-    setTimeout(function(){Tone.Transport.stop();}, 1000);
+    setTimeout(function () {
+      vol.volume.value = min_vol;
+      Tone.Transport.stop();
+    }, 1000);
   }
 
   function play() {
