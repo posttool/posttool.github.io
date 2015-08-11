@@ -16,15 +16,6 @@ module.exports = function (g2d) {
   scene.addObject(line);
   camera.position.z = 1000;
 
-  return {
-    camera: camera,
-    animate: animate,
-    move: function () {
-      x = random.btw(-Math.PI, 2 * Math.PI);
-      y = random.btw(-Math.PI, 2 * Math.PI);
-    }
-  }
-
   function get_r() {
     return random.btw(-1, 2) * 1500;
   }
@@ -96,6 +87,15 @@ module.exports = function (g2d) {
   function animate() {
     requestAnimationFrame(animate);
     render();
+  }
+
+  return {
+    camera: camera,
+    animate: animate,
+    move: function () {
+      x = random.btw(-Math.PI, 2 * Math.PI);
+      y = random.btw(-Math.PI, 2 * Math.PI);
+    }
   }
 
 }

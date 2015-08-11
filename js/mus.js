@@ -1,15 +1,15 @@
 var random = require('./rnd');
 
 module.exports = function (options) {
-  var mc = new Tone.Compressor(-20, 2.5).toMaster();
-
-  var synth = new Tone.PolySynth(3, Tone.FMSynth).connect(mc);
-  synth.set({
+  var min_vol = -86;
+  var vol = new Tone.Volume(min_vol).toMaster();
+  var mc = new Tone.Compressor(-20, 2.5).connect(vol);
+  var s1 = new Tone.PolySynth(3, Tone.FMSynth).connect(mc);
+  s1.set({
     envelope: {attack: 0.03, sustain: .01},
     carrier: {oscillator: {type: 'square'}, filter: {type: 'lowpass'}},
     volume: -10
   });
-
   var s2 = new Tone.PolySynth(3, Tone.AMSynth).connect(mc);
   var s3 = new Tone.PolySynth(3, Tone.MonoSynth).connect(mc);
   s3.set({
@@ -19,8 +19,7 @@ module.exports = function (options) {
   });
 
   var dist = new Tone.Distortion({
-    distortion: 0.1,
-    wet: 0.5
+    distortion: 0.1, wet: 0.5
   });
   var hats = new Tone.Sampler("./audio/505/hh.mp3", {
     volume: -10,
@@ -151,7 +150,7 @@ module.exports = function (options) {
     }
     for (var i = Math.max(0, la - 5); i < la; i++) {
       if (m % phrases[i].mod == 0) {
-        var s = i % 3 == 2 ? s3 : synth;
+        var s = i % 3 == 2 ? s3 : s1;
         m1(s, time, phrases[i].phrase, phrases[i].vel);
       }
     }
@@ -169,22 +168,24 @@ module.exports = function (options) {
     }
   }, LONG);
 
+
   function pause() {
+    vol.volume.rampTo(min_vol, 1);
     is_playing = false;
-    Tone.Transport.stop();
-    Tone.Master.mute = true;
+    setTimeout(function(){Tone.Transport.stop();}, 1000);
   }
 
   function play() {
     is_playing = true;
     Tone.Transport.start();
-    Tone.Master.mute = false;
+    vol.volume.rampTo(0, 5);
   }
 
   function set_part(p) {
     la = p;
     if (la > 24) la = 0;
     if (la < 0) la = 24;
+    return la;
   }
 
   function get_part() {

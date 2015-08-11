@@ -1,12 +1,15 @@
+require('./main.css');
+
 var scenery = require('./img');
 var soundtrack = require('./mus');
-require('./main.css');
 
 $(document).on('ready', function () {
   var canvas = document.getElementById('menu_canvas');
-  var context = canvas.getContext('2d');
-  var scene = scenery(context);
+  var ctx = canvas.getContext('2d');
+  var scene = scenery(ctx);
   scene.animate();
+
+  var playing = false;
   var sound = soundtrack({
     part: localStorage.getItem('part'),
     interval: function (m) {
@@ -14,11 +17,10 @@ $(document).on('ready', function () {
         scene.move();
     }
   });
-  var playing = false;
 
   function update(p) {
-    if (p) {
-      sound.setPart(p);
+    if (p != null) {
+      p = sound.setPart(p);
       localStorage.setItem('part', p);
     } else {
       p = sound.part();
@@ -37,23 +39,27 @@ $(document).on('ready', function () {
 
   $(window).on('keydown', function (e) {
     var code = e.keyCode ? e.keyCode : e.which;
-    if (code == 38 || code == 39) {
-      update(sound.part() + 1);
-    }
-    if (code == 37 || code == 40) {
-      update(sound.part() - 1);
-    }
-    if (code == 32) {
-      if (is_audio_playing()) {
-        $('#fa').show();
-        playing = false;
-        sound.pause();
-      }
-      else {
-        $('#fa').hide();
-        playing = true;
-        sound.play();
-      }
+    switch (code) {
+      case 38:
+      case 39:
+        update(sound.part() + 1);
+        return false;
+      case 37:
+      case 40:
+        update(sound.part() - 1);
+        return false;
+      case 32:
+        if (is_audio_playing()) {
+          $('#fa').show();
+          playing = false;
+          sound.pause();
+        }
+        else {
+          $('#fa').hide();
+          playing = true;
+          sound.play();
+        }
+        return false;
     }
   });
 
@@ -72,11 +78,6 @@ $(document).on('ready', function () {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   }
-
-  //$(window).on('touchstart', function (e) {
-  //  e.preventDefault();
-  //  Tone.startMobile();
-  //});
 
   resizeCanvas();
   update();
