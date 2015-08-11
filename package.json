@@ -1,0 +1,21 @@
+{
+  "name": "posttool.github.io",
+  "version": "0.0.1",
+  "description": "",
+  "main": "bundle.js",
+  "devDependencies": {
+    "webpack": "^1.11.0",
+    "style-loader": "^0.12.3",
+    "css-loader": "^0.15.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/posttool/posttool.github.io"
+  },
+  "author": "David Karam",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/posttool/posttool.github.io/issues"
+  },
+  "homepage": "http://posttool.github.io"
+}
