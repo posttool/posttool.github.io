@@ -16,8 +16,9 @@ $(document).on('ready', function () {
   });
 
   function update(p) {
-    if (p) {
+    if (p != null) {
       sound.setPart(p);
+      p = sound.part();
       localStorage.setItem('part', p);
     } else {
       p = sound.part();
@@ -26,7 +27,7 @@ $(document).on('ready', function () {
     $('#la').text(p);
   }
 
-  function is_text_hidden(){
+  function is_text_hidden() {
     return $('#fa').css('display') == 'none';
   }
 
@@ -38,9 +39,11 @@ $(document).on('ready', function () {
     var code = e.keyCode ? e.keyCode : e.which;
     if (code == 38 || code == 39) {
       update(sound.part() + 1);
+      return false;
     }
     if (code == 37 || code == 40) {
       update(sound.part() - 1);
+      return false;
     }
     if (code == 32) {
       if (is_text_hidden()) {
@@ -51,6 +54,7 @@ $(document).on('ready', function () {
         $('#fa').hide();
         sound.play();
       }
+      return false;
     }
   });
 

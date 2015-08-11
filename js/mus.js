@@ -167,20 +167,16 @@ module.exports = function (options) {
     }
   }, LONG);
 
-  // Tone.Buffer.onload = function () {
-  //   Tone.Transport.start();
-  // }
-
   function pause() {
     console.log("pause")
     Tone.Transport.stop();
-    Tone.Master.mute = true; 
+    Tone.Master.mute = true;
   }
 
   function play() {
     console.log("play")
     Tone.Transport.start();
-    Tone.Master.mute = false; 
+    Tone.Master.mute = false;
   }
 
   function set_part(p) {
