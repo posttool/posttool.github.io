@@ -128,17 +128,17 @@ module.exports = function (options) {
 
   function drone(time) {
     if (random.yes())
-      s2.triggerAttackRelease("C2", LONG, time, random.btw(0, 1));
+      s2.triggerAttackRelease("C2", LONG, time, random.btw(0,.7));
     else
-      s2.triggerAttackRelease("G2", LONG, time, random.btw(0, 1));
+      s2.triggerAttackRelease("G2", LONG, time, random.btw(0, .7));
     if (random.yes())
-      s2.triggerAttackRelease("C2", LONG, time, random.btw(0, 1));
+      s2.triggerAttackRelease("C2", LONG, time, random.btw(0, .7));
     else
-      s2.triggerAttackRelease("G3", LONG, time, random.btw(0, .9)); //:-()
+      s2.triggerAttackRelease("G3", LONG, time, random.btw(0, .66)); //:-()
     if (random.yes())
-      s2.triggerAttackRelease("C1", LONG, time, random.btw(0, 1));
+      s2.triggerAttackRelease("C1", LONG, time, random.btw(0, .7));
     else
-      s2.triggerAttackRelease("D2", LONG, time, random.btw(0, .9)); //:-)(
+      s2.triggerAttackRelease("D2", LONG, time, random.btw(0, .66)); //:-)(
   }
 
   var m = 0;
