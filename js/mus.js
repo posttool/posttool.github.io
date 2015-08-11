@@ -1,3 +1,5 @@
+var random = require('./rnd');
+
 module.exports = function (options) {
   var mc = new Tone.Compressor(-20, 2.5).toMaster();
 
@@ -16,7 +18,7 @@ module.exports = function (options) {
     volume: -5
   });
 
-  var crusher = new Tone.Distortion({
+  var dist = new Tone.Distortion({
     distortion: 0.1,
     wet: 0.5
   });
@@ -25,23 +27,24 @@ module.exports = function (options) {
     envelope: {attack: 0.001, decay: 0.02, sustain: 0.01, release: 0.01},
     filterEnvelope: {attack: 0.001, decay: 0.02, sustain: 1, min: 6000, max: 600},
     filter: {type: 'highpass', freq: 500}
-  }).connect(crusher);
+  }).connect(dist);
   var snare = new Tone.Sampler("./audio/505/snare.mp3", {
     envelope: {attack: 0.01, decay: 0.05, sustain: 0},
     filterEnvelope: {attack: 0.001, decay: 0.01, sustain: 0, min: 3000, max: 10000},
     filter: {type: 'lowpass', freq: 700}
-  }).connect(crusher);
+  }).connect(dist);
   var kick = new Tone.Sampler("./audio/505/kick.mp3", {
     volume: -8
   });
   var eq = new Tone.EQ3(4, 5, 0);
+  var dc = new Tone.Compressor({threshold: -20, ratio: 6, attack: 0.01, release: 0.01}).connect(mc);
   kick.connect(eq);
-  var drumCompress = new Tone.Compressor({threshold: -20, ratio: 6, attack: 0.01, release: 0.01}).connect(mc);
-  eq.connect(drumCompress);
-  crusher.connect(drumCompress);
+  eq.connect(dc);
+  dist.connect(dc);
 
   // lll
   var la = options.part ? Math.max(0, Math.min(24, options.part)) : 0;
+  var is_playing = false;
 
   var LONG = 1;
   var MEDIUM_LONG = LONG * .5;
@@ -54,47 +57,47 @@ module.exports = function (options) {
     phrases.push({
       phrase: gen_phrase(['C', 'C', 'C', 'G', 'G', 'G', 'D', 'D', 'B'],
         ['2', '3', '3', '4'], MEDIUM_LONG, 0),
-      mod: rnd(4) + 4, vel: rvel()
+      mod: random.rndf(4) + 4, vel: rvel()
     });
   }
   for (var i = 0; i < 5; i++) {
     phrases.push({
       phrase: gen_phrase(['C', 'C', 'C', 'G', 'G', 'G', 'D', 'D', 'B', 'B'],
         ['2', '3', '3', '4', '4', '4'], MEDIUM, 0),
-      mod: rnd(3) + 2, vel: rvel()
+      mod: random.rndf(3) + 2, vel: rvel()
     });
   }
   for (var i = 0; i < 5; i++) {
     phrases.push({
       phrase: gen_phrase(['C', 'C', 'C', 'G', 'G', 'G', 'D', 'D', 'B', 'B', 'A', 'A'],
         ['3', '3', '4', '4', '4', '5'], MEDIUM_SHORT, MEDIUM_SHORT),
-      mod: rnd(3) + 2, vel: rvel()
+      mod: random.rndf(3) + 2, vel: rvel()
     });
   }
   for (var i = 0; i < 5; i++) {
     phrases.push({
       phrase: gen_phrase(['C', 'C', 'C', 'G', 'G', 'G', 'D', 'D', 'B', 'B'],
         ['2', '3', '3', '4', '4', '4'], MEDIUM, 0),
-      mod: rnd(3) + 2, vel: rvel()
+      mod: random.rndf(3) + 2, vel: rvel()
     });
   }
   for (var i = 0; i < 5; i++) {
     phrases.push({
       phrase: gen_phrase(['C', 'C', 'C', 'G', 'G', 'G', 'D', 'D', 'B', 'B', 'A', 'A'],
         ['3', '3', '4', '4', '4', '5', '5'], MEDIUM_SHORT, SHORT),
-      mod: rnd(3) + 2, vel: rvel()
+      mod: random.rndf(3) + 2, vel: rvel()
     });
   }
 
   function gen_phrase(notes, octaves, mind, vard) {
     var phrase = [];
-    var c = rnd(18) + 3;
+    var c = random.rndf(18) + 3;
     for (var i = 0; i < c; i++) {
-      var d = mind + (vard * rnd(c - 3));
-      if (rnd(10) < 3)
+      var d = mind + (vard * random.rndf(c - 3));
+      if (random.rndf(10) < 3)
         phrase.push({note: null, duration: d});
       else
-        phrase.push({note: notes[rnd(notes.length)] + octaves[rnd(octaves.length)], duration: d});
+        phrase.push({note: random.oneOf(notes) + random.oneOf(octaves), duration: d});
     }
     return phrase;
   }
@@ -109,36 +112,35 @@ module.exports = function (options) {
   }
 
   function snarez(time, s) {
-    var r = rnd(3) + 3;
+    var r = random.rndf(3) + 3;
     for (var i = 0; i < r; i++) {
-      if (rnd(10) > 5)
+      if (random.rndf(10) > 5)
         snare.triggerAttackRelease(0, SHORT, time + i * SHORT, s);
     }
   }
 
   function hatz(time, s) {
-    var r = rnd(16) + 3;
+    var r = random.rndf(16) + 3;
     for (var i = 0; i < r; i++) {
-      if (i == 0 || rnd(10) > 3)
+      if (i == 0 || random.rndf(10) > 3)
         hats.triggerAttackRelease(0, SHORT, time + i * SHORT, s);
     }
   }
 
   function drone(time) {
-    if (yes())
-      s2.triggerAttackRelease("C2", LONG, time, Math.random());
+    if (random.yes())
+      s2.triggerAttackRelease("C2", LONG, time, random.btw(0, 1));
     else
-      s2.triggerAttackRelease("G2", LONG, time, Math.random());
-    if (yes())
-      s2.triggerAttackRelease("C2", LONG, time, Math.random());
+      s2.triggerAttackRelease("G2", LONG, time, random.btw(0, 1));
+    if (random.yes())
+      s2.triggerAttackRelease("C2", LONG, time, random.btw(0, 1));
     else
-      s2.triggerAttackRelease("G3", LONG, time, Math.random()); //:-()
-    if (yes())
-      s2.triggerAttackRelease("C1", LONG, time, Math.random());
+      s2.triggerAttackRelease("G3", LONG, time, random.btw(0, .9)); //:-()
+    if (random.yes())
+      s2.triggerAttackRelease("C1", LONG, time, random.btw(0, 1));
     else
-      s2.triggerAttackRelease("D2", LONG, time, Math.random()); //:-)(
+      s2.triggerAttackRelease("D2", LONG, time, random.btw(0, .9)); //:-)(
   }
-
 
   var m = 0;
   Tone.Transport.setInterval(function (time) {
@@ -167,20 +169,16 @@ module.exports = function (options) {
     }
   }, LONG);
 
-  // Tone.Buffer.onload = function () {
-  //   Tone.Transport.start();
-  // }
-
   function pause() {
-    console.log("pause")
+    is_playing = false;
     Tone.Transport.stop();
-    Tone.Master.mute = true; 
+    Tone.Master.mute = true;
   }
 
   function play() {
-    console.log("play")
+    is_playing = true;
     Tone.Transport.start();
-    Tone.Master.mute = false; 
+    Tone.Master.mute = false;
   }
 
   function set_part(p) {
@@ -193,27 +191,12 @@ module.exports = function (options) {
     return la;
   }
 
-  function yes() {
-    return Math.random() < .5;
-  }
-
-  function rnd(r) {
-    return Math.floor(Math.random() * r);
-  }
-
   function rvel() {
-    return Math.random() * .4 + .15;
+    return random.btw(.15, .4);
   }
-
-  window.addEventListener('focus', function () {
-    play();
-  });
-
-  window.addEventListener('blur', function () {
-    pause();
-  });
 
   return {
+    isPlaying: is_playing,
     play: play,
     pause: pause,
     setPart: set_part,

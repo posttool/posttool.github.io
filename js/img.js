@@ -1,6 +1,8 @@
+var random = require('./rnd');
+
 module.exports = function (g2d) {
   var globalScale = 100,
-    xOffset = 590,
+    xOffset = 890,
     yOffset = 420,
     x = 0,
     y = 0;
@@ -18,13 +20,13 @@ module.exports = function (g2d) {
     camera: camera,
     animate: animate,
     move: function () {
-      x = Math.random() * 2 * Math.PI - Math.PI;
-      y = Math.random() * 2 * Math.PI - Math.PI;
+      x = random.btw(-Math.PI, 2 * Math.PI);
+      y = random.btw(-Math.PI, 2 * Math.PI);
     }
   }
 
   function get_r() {
-    return (Math.random() * 2 - 1) * 1500;
+    return random.btw(-1, 2) * 1500;
   }
 
   function render_line(v1, v2) {
@@ -81,7 +83,7 @@ module.exports = function (g2d) {
         var e1 = renderList[j];
         render_line(el.v1, e1.v2);
       }
-      if (Math.random() < .5)
+      if (random.yes())
         render_box(renderList[i], "#ffffff", .02);
       else {
         var ccc = Math.floor(camera.position.z * .02);
