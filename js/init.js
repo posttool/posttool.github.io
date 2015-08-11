@@ -14,6 +14,7 @@ $(document).on('ready', function () {
         scene.move();
     }
   });
+  var playing = false;
 
   function update(p) {
     if (p) {
@@ -26,8 +27,8 @@ $(document).on('ready', function () {
     $('#la').text(p);
   }
 
-  function is_text_hidden(){
-    return $('#fa').css('display') == 'none';
+  function is_audio_playing() {
+    return playing;
   }
 
   $(document).on('click', function () {
@@ -43,16 +44,28 @@ $(document).on('ready', function () {
       update(sound.part() - 1);
     }
     if (code == 32) {
-      if (is_text_hidden()) {
+      if (is_audio_playing()) {
         $('#fa').show();
+        playing = false;
         sound.pause();
       }
       else {
         $('#fa').hide();
+        playing = true;
         sound.play();
       }
     }
   });
+
+  $(window).on('focus', function () {
+    if (playing)
+      sound.play();
+  });
+
+  $(window).on('blur', function () {
+    sound.pause();
+  });
+
 
   $(window).on('resize', resizeCanvas, false);
   function resizeCanvas() {
