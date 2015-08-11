@@ -1,67 +1,119 @@
 <!doctype html>
 <html>
 <head>
-<meta charset="utf-8">
-<meta http-equiv="x-ua-compatible" content="ie=edge">
-<title>This is Not a Machine Learning</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="/js/lib/three/RequestAnimationFrame.js"></script>
-<script src="/js/lib/three/ThreeCanvas.js"></script>
-<script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
-<script src="http://cdn.tonejs.org/latest/Tone.min.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>This is Not a Machine Learning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="/js/lib/three/RequestAnimationFrame.js"></script>
+    <script src="/js/lib/three/ThreeCanvas.js"></script>
+    <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="http://cdn.tonejs.org/latest/Tone.min.js"></script>
 </head>
 <body>
 <canvas id="menu_canvas"></canvas>
 <div id="la">0</div>
 <div id="fa">
-<p>Use arrow keys to move through composition. Use the space to hide this message and start the audio. Reload the page to generate a variation on the piece.</p>
+    <p>Use arrow keys to move through composition. Use the space to hide this message and start the audio. Reload the
+        page to generate a variation on the piece.</p>
 
-<br>
+    <br>
 
-<p><strong>This is Not a Machine Learning</strong></p>
-<p>
-Machine learning is huge today. Blogs with new techniques related to modeling, composition and visualization emerge daily &mdash; amazing projects like <a href="http://www.hexahedria.com/2015/08/03/composing-music-with-recurrent-neural-networks/">Composing Music With Recurrent Neural Networks</a>. It's wild that such complex human outcomes can be emulated with the statistical models of machine learning and neural networks (given enough sample data to get started).
-</p>
-<p>
-They succeed where deductive logic fails us.
-What's the formula for recognizing handwriting, or for composing music? 
-By induction, examining lots and lots of similar examples &mdash; sometimes with human supervision and sometimes without &mdash; neural networks can come up with successful predictions and classifications.
-A machine that learns from example, without explicit instructions, has incredible implications. I suppose thats why so many are <a href="http://www.theguardian.com/technology/2015/jan/29/artificial-intelligence-strong-concern-bill-gates">concerned</a> that it might lead to our end. 
-</p>
-<p>
-But, using the term “neural network” implicitly claims that these statistical models function like the brain or human intelligence. While that may be the stated goal of AI researchers, really, that’s begging the question. The computer “neuron” is a metaphor. We can call it that because it does some things with results that are human-like and have configurations that are somewhat neuron-like. But there is only a loose relationship between the computer model and the brain. Frankly, the inner workings of both kinds of neurons are still mysterious. Training a network is not the same as learning.
-</p>
-<p>
- Really, are we concerned with modeling the human brain or are we honing statistical principles? These divergent goals should be identified appropriately. And, the implications of neural nets becoming artifically intelligent, <i>really</i> intelligent, seems a little extreme.
-</p>
-<p>
-In my own work, I have had the opportunity to evaluate machine learning libraries and paradigms, as well as an amazing array of sample material that tends to accompany the theory. From large text corpora and image sets, to bodies of recorded audio material, almost any data set large enough (and somewhat homogeneous) can be seen as material from which we can train a model. We are only beginning to feed the world to these machines. Who can predict what successes lie ahead?
-</p>
-<p>
-In terms of creative output though, my concern is that we will continue to move into a realm where the statistical representation is what we deem acceptable. How do you chose the movies you watch on Netflix? The music you listen to on Spotify? I mean, its cool that we can generate more Mozart statistically, but really, who cares? The interesting thing is Mozart, not the machine that can emulate him. 
-</p>
-<p>
-This critique extends to much of the aesthetic of the new internet. It is statiscally driven for the most part. Too much consensus is not a good thing. Where is the risk? Machine learning is great for selection, but who is in charge of mutation and deduction? I believe that is our job. The instant you recognize that the machine can predict your tell, you will have no choice but to change it. Sure the intelligent machine might kill you, but that is at least a few decades away.
-</p>
-<p>
-Until that time, we will always need to continue to create the "sample" material for future intelligent networks to "learn" from. I am not saying that this piece you hear here is potential training material &mdash; but it is derived from research and application of various forms of machine learning. If you look at the source you will notice that this is based on statistics and probabilities. Those "rules" are my choice. I suppose I could have created static music compositions that sounded like this and then trained a model, but that seems counter-intuitive.
-</p>
+    <p><strong>This is Not a Machine Learning</strong></p>
 
-<p>
-All this said, in regards to the science, this critique is only semantic. I look forward to following the incredible work of those who are advancing the field. This audio/visual presentation is a meditation on the thinking expressed here. 
-</p>
-<p>David Karam, August 10, 2015 with some extra special help from Steve Hartzog.</p>
-<p>Made using <a href="http://threejs.org/">three.js</a> and <a href="http://tonejs.org/">Tone.js</a> &mdash; view the <a href="https://github.com/posttool/posttool.github.io/tree/master/js">source</a>.</p>
+    <p>
+        Machine learning is huge today. Blogs with new techniques related to modeling, composition and visualization
+        emerge daily. It&rsquo;s wild that such complex human outcomes can be emulated with the statistical models of machine
+        learning and neural networks (given enough sample data to get started).
+    </p>
+
+    <p>
+        They succeed where deductive logic fails us. What&rsquo;s the formula for recognizing handwriting, or for composing
+        music? By induction, examining lots and lots of similar examples&mdash;sometimes with human supervision and
+        sometimes without&mdash;neural networks can come up with successful predictions and classifications.
+        A machine that learns from example, without explicit instructions, has incredible implications. I suppose that
+        is why so many are <a
+            href="http://www.theguardian.com/technology/2015/jan/29/artificial-intelligence-strong-concern-bill-gates">concerned</a>
+        that it might lead to our end.
+    </p>
+
+    <p>
+        But, using the term &ldquo;neural network&rdquo; implicitly claims that these statistical models function like
+        the brain or
+        human intelligence. While that may be the stated goal of AI researchers, really, that’s begging the question.
+        The computer “neuron” is a metaphor. We can call it that because it does some things with results that are
+        human-like and have configurations that are somewhat neuron-like. But there is only a loose relationship between
+        the computer model and the brain. Frankly, the inner workings of both kinds of neurons are still mysterious.
+        Training a network is not the same as learning.
+    </p>
+
+    <p>
+        Really, are we concerned with modeling the human brain or are we honing statistical principles? These divergent
+        goals should be identified appropriately. And, the implications of neural nets becoming artificially
+        intelligent,
+        <i>really</i> intelligent, seems a little extreme.
+    </p>
+
+    <p>
+        In my own work, I have had the opportunity to evaluate machine learning libraries and paradigms, as well as an
+        amazing array of sample material that tends to accompany the theory. From large text corpora and image sets, to
+        bodies of recorded audio material, almost any data set large enough (and somewhat homogeneous) can be seen as
+        material from which we can train a model. We are only beginning to feed the world to these machines. Who can
+        predict what successes lie ahead?
+    </p>
+
+    <p>
+        In terms of creative output though, my concern is that we will continue to move into a realm where the
+        statistical representation is what we deem acceptable. How do you chose the movies you watch on Netflix? The
+        music you listen to on Spotify? I mean, its cool that we can generate more Mozart statistically, but really, who
+        cares? The interesting thing is Mozart, not the machine that can emulate him.
+    </p>
+
+    <p>
+        This critique extends to much of the aesthetic of the new internet. It is statistically driven for the most
+        part.
+        Too much consensus is not a good thing. Where is the risk? Machine learning is great for selection, but who is
+        in charge of mutation and deduction? I believe that is our job. The instant you recognize that the machine can
+        predict your tell, you will have no choice but to change it. Sure the intelligent machine might kill you, but
+        that is at least a few decades away.
+    </p>
+
+    <p>
+        Until that time, we will always need to continue to create the &ldquo;sample&rdquo; material for future
+        intelligent networks to &ldquo;learn&rdquo; from. I am not saying that this piece you hear here is potential
+        training material&mdash;but it is derived from research and application of various forms of machine learning. If
+        you look at the source you will notice that this is based on statistics and probabilities. Those &ldquo;rules&rdquo;
+        are my choice. I could have created static music compositions that sounded like this and then trained a model,
+        but that seems counter-intuitive.
+    </p>
+
+    <p>
+        All this said, in regards to the science, this critique is only semantic. I look forward to following the
+        incredible work of those who are advancing the field. This audio/visual presentation is a meditation on the
+        thinking expressed here.
+    </p>
+
+    <p>David Karam, August 10, 2015 with some extra special help from Steve Hartzog.</p>
+
+    <p>Made using <a href="http://threejs.org/">three.js</a> and <a href="http://tonejs.org/">Tone.js</a> &mdash; view
+        the <a href="https://github.com/posttool/posttool.github.io/tree/master/js">source</a>.</p>
 
 </div>
 <script type="text/javascript" src="bundle.js" charset="utf-8"></script>
 </body>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-66083597-1', 'auto');
-  ga('send', 'pageview');
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    ga('create', 'UA-66083597-1', 'auto');
+    ga('send', 'pageview');
 </script>
 </html>
