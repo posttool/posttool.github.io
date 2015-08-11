@@ -2,7 +2,7 @@ var random = require('./rnd');
 
 module.exports = function (g2d) {
   var globalScale = 100,
-    xOffset = 890,
+    xOffset = 590,
     yOffset = 420,
     x = 0,
     y = 0;
@@ -11,8 +11,13 @@ module.exports = function (g2d) {
     scene = new THREE.Scene(),
     geometry = new THREE.Geometry(),
     line = new THREE.Line(geometry);
-  for (var i = 0; i < 16; i++)
-    geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(get_r(), get_r(), get_r())));
+  for (var i = 0; i < 16; i++) {
+    var v = new THREE.Vertex(new THREE.Vector3(get_r(), get_r(), get_r()));
+    v.position.dx = v.position.x;
+    v.position.dy = v.position.y;
+    v.position.dz = v.position.z;
+    geometry.vertices.push(v);
+  }
   scene.addObject(line);
   camera.position.z = 1000;
 
@@ -54,10 +59,18 @@ module.exports = function (g2d) {
     g2d.fillRect(b.x, b.y, b.w, b.h);
   }
 
+  var S = .2;
+
   function render() {
     camera.position.x += ( x - camera.position.x ) * .05;
     camera.position.y += ( -y + 200 - camera.position.y ) * .05;
     line.rotation.y += ( x - line.rotation.y ) * .005;
+
+    geometry.vertices.forEach(function (v) {
+      v.position.x += (v.position.dx - v.position.x) * S;
+      v.position.y += (v.position.dy - v.position.y) * S;
+      v.position.z += (v.position.dz - v.position.z) * S;
+    });
 
     var renderList = projector.projectScene(scene, camera, false);
     for (var i = 0; i < renderList.length; i++) {
@@ -95,6 +108,16 @@ module.exports = function (g2d) {
     move: function () {
       x = random.btw(-Math.PI, 2 * Math.PI);
       y = random.btw(-Math.PI, 2 * Math.PI);
+      if (random.rnd(1) < .3) {
+        geometry.vertices.forEach(function (v) {
+          if (random.rnd(1) < .3)
+            v.position.dx += random.btw(-150, 150);
+          if (random.rnd(1) < .3)
+            v.position.dy += random.btw(-150, 150);
+          if (random.rnd(1) < .3)
+            v.position.dz += random.btw(-150, 150);
+        });
+      }
     }
   }
 
