@@ -128,17 +128,17 @@ module.exports = function (options) {
 
   function drone(time) {
     if (random.yes())
-      s2.triggerAttackRelease("C2", LONG, time, random.btw(0,.7));
+      s2.triggerAttackRelease("C2", LONG, time, random.btw(0, .4));
     else
-      s2.triggerAttackRelease("G2", LONG, time, random.btw(0, .7));
+      s2.triggerAttackRelease("G2", LONG, time, random.btw(0, .4));
     if (random.yes())
-      s2.triggerAttackRelease("C2", LONG, time, random.btw(0, .7));
+      s2.triggerAttackRelease("C2", LONG, time, random.btw(0, .4));
     else
-      s2.triggerAttackRelease("G3", LONG, time, random.btw(0, .66)); //:-()
+      s2.triggerAttackRelease("G3", LONG, time, random.btw(0, .4)); //:-()
     if (random.yes())
-      s2.triggerAttackRelease("C1", LONG, time, random.btw(0, .7));
+      s2.triggerAttackRelease("C1", LONG, time, random.btw(0, .4));
     else
-      s2.triggerAttackRelease("D2", LONG, time, random.btw(0, .66)); //:-)(
+      s2.triggerAttackRelease("D2", LONG, time, random.btw(0, .4)); //:-)(
   }
 
   var m = 0;
@@ -181,7 +181,7 @@ module.exports = function (options) {
   function play() {
     is_playing = true;
     Tone.Transport.start();
-    vol.volume.rampTo(0, 5);
+    vol.volume.rampTo(-2, 1);
   }
 
   function set_part(p) {
@@ -196,7 +196,7 @@ module.exports = function (options) {
   }
 
   function rvel() {
-    return random.btw(.15, .4);
+    return random.btw(.15, .33);
   }
 
   return {

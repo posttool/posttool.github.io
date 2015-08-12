@@ -29,10 +29,6 @@ $(document).on('ready', function () {
     $('#la').text(p);
   }
 
-  function is_audio_playing() {
-    return playing;
-  }
-
   $(document).on('click', function () {
     update(sound.part() + 1);
   });
@@ -49,7 +45,7 @@ $(document).on('ready', function () {
         update(sound.part() - 1);
         return false;
       case 32:
-        if (is_audio_playing()) {
+        if (playing) {
           $('#fa').show();
           playing = false;
           sound.pause();
