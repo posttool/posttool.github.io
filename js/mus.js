@@ -18,30 +18,24 @@ module.exports = function (options) {
     volume: -5
   });
 
-  var dist = new Tone.Distortion({
-    distortion: 0.1, wet: 0.5
-  });
-  var hats = new Tone.Sampler("./audio/505/hh.mp3", {
+  var dc = new Tone.Compressor({threshold: -20, ratio: 6, attack: 0.01, release: 0.01}).connect(mc);
+  var eq = new Tone.EQ3(4, 5, 0).connect(dc);
+  var dist = new Tone.Distortion({distortion: 0.1, wet: 0.5}).connect(dc);
+  var hats = new Tone.Sampler('./audio/505/hh.mp3', {
     volume: -10,
     envelope: {attack: 0.001, decay: 0.02, sustain: 0.01, release: 0.01},
     filterEnvelope: {attack: 0.001, decay: 0.02, sustain: 1, min: 6000, max: 600},
     filter: {type: 'highpass', freq: 500}
   }).connect(dist);
-  var snare = new Tone.Sampler("./audio/505/snare.mp3", {
+  var snare = new Tone.Sampler('./audio/505/snare.mp3', {
     envelope: {attack: 0.01, decay: 0.05, sustain: 0},
     filterEnvelope: {attack: 0.001, decay: 0.01, sustain: 0, min: 3000, max: 10000},
     filter: {type: 'lowpass', freq: 700}
   }).connect(dist);
-  var kick = new Tone.Sampler("./audio/505/kick.mp3", {
+  var kick = new Tone.Sampler('./audio/505/kick.mp3', {
     volume: -8
-  });
-  var eq = new Tone.EQ3(4, 5, 0);
-  var dc = new Tone.Compressor({threshold: -20, ratio: 6, attack: 0.01, release: 0.01}).connect(mc);
-  kick.connect(eq);
-  eq.connect(dc);
-  dist.connect(dc);
+  }).connect(eq);
 
-  // lll
   var la = options.part ? Math.max(0, Math.min(24, options.part)) : 0;
   var is_playing = false;
 
@@ -128,17 +122,17 @@ module.exports = function (options) {
 
   function drone(time) {
     if (random.yes())
-      s2.triggerAttackRelease("C2", LONG, time, random.btw(0, .4));
+      s2.triggerAttackRelease('C2', LONG, time, random.btw(0, .4));
     else
-      s2.triggerAttackRelease("G2", LONG, time, random.btw(0, .4));
+      s2.triggerAttackRelease('G2', LONG, time, random.btw(0, .4));
     if (random.yes())
-      s2.triggerAttackRelease("C2", LONG, time, random.btw(0, .4));
+      s2.triggerAttackRelease('C2', LONG, time, random.btw(0, .4));
     else
-      s2.triggerAttackRelease("G3", LONG, time, random.btw(0, .4)); //:-()
+      s2.triggerAttackRelease('G3', LONG, time, random.btw(0, .4)); //:-()
     if (random.yes())
-      s2.triggerAttackRelease("C1", LONG, time, random.btw(0, .4));
+      s2.triggerAttackRelease('C1', LONG, time, random.btw(0, .4));
     else
-      s2.triggerAttackRelease("D2", LONG, time, random.btw(0, .4)); //:-)(
+      s2.triggerAttackRelease('D2', LONG, time, random.btw(0, .4)); //:-)(
   }
 
   var m = 0;
